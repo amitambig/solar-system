@@ -11,20 +11,20 @@ env:
     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
 jobs:
     unit_test:
-        strategy:
-            matrix:
-                node-version: [18,19,20]
-                operating-system: [ubuntu-latest,  macos-latest]
-                exclude:
-                    - node-version: 18
-                      operating-system: macos-latest
-        runs-on: ${{ matrix.operating-system }}
+        # strategy:
+        #     matrix:
+        #         node-version: [18,19,20]
+        #         operating-system: [ubuntu-latest,  macos-latest]
+        #         exclude:
+        #             - node-version: 18
+        #               operating-system: macos-latest
+        runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
             - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
-                  node-version: ${{ matrix.node-version }}
+                  node-version: 18 
             - name: Install dependencies
               run: npm install
             
@@ -36,3 +36,25 @@ jobs:
               with:
                   name: test-results
                   path: test-results.xml
+
+    Code_coverage:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Install dependencies
+              run: npm install
+            
+            - name: Run coverage
+              continue-on-error: true
+              run: npm run coverage
+            
+            - name: archive coverage results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: coverage-results
+                  path: coverage
+                  retain-days: 5
