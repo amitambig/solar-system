@@ -19,6 +19,15 @@ jobs:
         #             - node-version: 18
         #               operating-system: macos-latest
         runs-on: ubuntu-latest
+        services:
+            mongo:
+                image: siddharth67/mongo-db:non-prod
+                ports:
+                    - 27017:27017
+        env:
+            MONGO_URI: 'mongodb://localhost:27017/superData'
+            MONGO_USERNAME: 'non-prod-user'
+            MONGO_PASSWORD: 'non-prod-password'
         steps:
             - uses: actions/checkout@v3
             - name: Set up Node.js
@@ -43,13 +52,24 @@ jobs:
                   path: test-results.xml
 
     Code_coverage:
+        container:
+          image: node:18
+        services:
+            mongo:
+                image: siddharth67/mongo-db:non-prod
+                options:
+                  --name mongo
+        env:
+            MONGO_URI: 'mongodb://mongo:27017/superData'
+            MONGO_USERNAME: 'non-prod-user'
+            MONGO_PASSWORD: 'non-prod-password'
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 18
+            # - name: Set up Node.js
+            #   uses: actions/setup-node@v3
+            #   with:
+            #       node-version: 18
             - name: Cache node modules
               uses: actions/cache@v3
               with:
